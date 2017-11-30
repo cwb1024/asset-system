@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- 打开注解 -->
+	<context:annotation-config />
+
+	<!-- 注解扫描配置 -->
+	<context:component-scan base-package="com.chengwenbi.service,com.chengwenbi.dao"/>
+
+	<!-- 数据库连接 -->
+	<context:property-placeholder location="classpath:jdbc-config.properties"/>
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:/config/core/mybatis.xml"/>
+        <property name="mapperLocations" value="classpath*:config/mapper/*.xml"/>
+	</bean>
+
+	<!-- spring mybatis -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.chengwenbi.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+
+	</bean>
+
+	<!-- 配置jdbc事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+</beans>
