@@ -24,6 +24,7 @@ public class UserController {
         log.debug("进入testUser的方法");
         List<User> users = userService.getUsers();
         log.debug("dasasasasasasasasasasasasss");
+        log.debug("真的测试成功了吗");
         log.debug("调用service的方法查出来的用户："+users.toString());
         return "index";
     }
