@@ -23,7 +23,7 @@ public class UserController {
     public String testUser(){
         log.debug("进入testUser的方法");
         List<User> users = userService.getUsers();
-        log.debug("dasasasasasasasasasasasas");
+        log.debug("dasasasasasasasasasasasasss");
         log.debug("调用service的方法查出来的用户："+users.toString());
         return "index";
     }
