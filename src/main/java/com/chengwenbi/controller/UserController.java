@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+/**
+ * @description:
+ * @author: chengwenbi
+ * @date:   2017/12/17 13:18
+ */
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -24,6 +29,10 @@ public class UserController {
         log.debug("进入testUser的方法");
         List<User> users = userService.getUsers();
         log.debug("调用service的方法查出来的用户："+users.toString());
+
         return "index";
     }
+
+
+
 }
