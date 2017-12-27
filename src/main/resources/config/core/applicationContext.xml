@@ -11,7 +11,7 @@
 	<context:annotation-config />
 
 	<!-- 注解扫描配置 -->
-	<context:component-scan base-package="com.chengwenbi.service,com.chengwenbi.dao"/>
+	<context:component-scan base-package="com.chengwenbi.service,com.chengwenbi.dao,com.chengwenbi.config"/>
 
 	<!-- 数据库连接 -->
 	<context:property-placeholder location="classpath:jdbc-config.properties"/>
