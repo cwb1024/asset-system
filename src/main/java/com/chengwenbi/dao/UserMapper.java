@@ -1,16 +1,10 @@
 package com.chengwenbi.dao;
 
-import com.chengwenbi.domain.User;
-import org.apache.ibatis.annotations.Select;
-import org.springframework.stereotype.Repository;
+import com.chengwenbi.dao.base.BaseInterfaceMapper;
+import com.chengwenbi.domain.UserDO;
 
-import java.util.List;
+public interface UserMapper extends BaseInterfaceMapper<UserDO> {
 
-@Repository
-public interface UserMapper {
+    public UserDO findByEmail(String email);
 
-    public List<User> getUsers();
-
-    @Select("select * from user")
-    public List<User> getUsers1();
 }

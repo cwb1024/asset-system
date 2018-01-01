@@ -1,10 +1,13 @@
 package com.chengwenbi.service;
 
-import com.chengwenbi.domain.User;
+import com.chengwenbi.common.Result;
+import com.chengwenbi.domain.UserDO;
+import com.chengwenbi.domain.UserDTO;
+import com.chengwenbi.service.base.IBaseInterfaceService;
 
-import java.util.List;
+public interface UserService extends IBaseInterfaceService<UserDO> {
 
-public interface UserService {
+    public Result login(UserDTO userDTO)throws Exception;
 
-    public List<User> getUsers();
+    public Result modifyPassword(UserDTO userDTO)throws Exception;
 }

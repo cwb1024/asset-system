@@ -40,6 +40,22 @@ public class Result<T extends Object> {
         this.data = data;
     }
 
+    public  void modifyResult(boolean success , Object data , String message){
+        this.setData(data);
+        this.setMessage(message);
+        this.setSuccess(success);
+    }
+
+    public  void modifyResult(boolean success , Object data){
+        this.setData(data);
+        this.setSuccess(success);
+    }
+
+    public  void modifyResult( boolean success , String message){
+        this.setMessage(message);
+        this.setSuccess(success);
+    }
+
     public boolean isSuccess() {
         return success;
     }
