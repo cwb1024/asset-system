@@ -20,7 +20,6 @@
         <result property="state" column="state"/>
     </resultMap>
 
-
     <sql id="All_Column_List">
         id,name,email,password,identity,state,create_id,create_name,create_time,modify_id,modify_name,modify_time
     </sql>
