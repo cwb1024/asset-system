@@ -15,7 +15,7 @@
     <resultMap id="result" type="UserDO" extends="BaseResult">
         <result property="name" column="name"/>
         <result property="email" column="email"/>
-        <result property="password" column="possword"/>
+        <result property="password" column="password"/>
         <result property="identity" column="identity"/>
         <result property="state" column="state"/>
     </resultMap>
