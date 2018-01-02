@@ -7,7 +7,9 @@ import com.chengwenbi.service.base.IBaseInterfaceService;
 
 public interface UserService extends IBaseInterfaceService<UserDO> {
 
-    public Result login(UserDTO userDTO)throws Exception;
+    Result login(UserDTO userDTO)throws Exception;
 
-    public Result modifyPassword(UserDTO userDTO)throws Exception;
+    Result modifyPassword(UserDTO userDTO)throws Exception;
+
+    Result modifyUserRole(UserDTO userDTO) throws Exception;
 }

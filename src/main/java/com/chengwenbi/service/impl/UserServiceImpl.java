@@ -8,6 +8,7 @@ import com.chengwenbi.domain.UserDO;
 import com.chengwenbi.domain.UserDTO;
 import com.chengwenbi.service.UserService;
 import com.chengwenbi.service.base.BaseInterfaceServiceImpl;
+import com.chengwenbi.util.MD5Util;
 import com.chengwenbi.util.ValidParamUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,32 +33,45 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
     public Result login(UserDTO userDTO)throws Exception {
         UserDO userDO = userMapper.findByEmail(userDTO.getEmail());
         if (userDO == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException("用户不存在，登录失败");
         }
-        if (!userDTO.getPassword().equals(userDTO.getPassword())){
-            throw new ServiceException("用户名密码不匹配");
+        //登录密码进行MD5加密比对
+        if (!userDO.getPassword().equals(MD5Util.getMD5(userDTO.getPassword()))) {
+            throw new ServiceException("用户名密码不匹配,登录失败");
         }
-        Result result = new Result();
-        result.modifyResult(true,"登陆成功");
-        return result;
+        return new Result(true,"登录成功");
     }
 
     @Override
     public Result modifyPassword(UserDTO userDTO) throws Exception{
-        ValidParamUtil.validNotNull(userDTO.getEmail());
+        ValidParamUtil.validNotNull(userDTO.getPassword(),userDTO.getNewPassword(),userDTO.getEmail());
 
         UserDO userDO = userMapper.findByEmail(userDTO.getEmail());
         if (userDO == null) {
             throw new ServiceException("用户不存在，不能修改密码");
         }
-
-        //DTO to DO
-        BeanUtils.copyProperties(userDO,userDTO);
+        //验证原密码是否正确
+        if (!userDO.getPassword().equals(MD5Util.getMD5(userDTO.getPassword()))) {
+            throw new ServiceException("原密码错误，请输入正确的原密码");
+        }
+        //覆盖原密码，进行更新
+        UserDO qo = new UserDO();
+        qo.setPassword(userDTO.getNewPassword());
+        qo.setEmail(userDO.getEmail());
         int res = userMapper.update(userDO);
         Result result = new Result();
         if (res != 0) {
-            result.modifyResult(true,"密码修改成功");
+            result.modifyResult(true, "密码修改成功");
+        } else {
+            result.modifyResult(false,"密码修改失败");
         }
         return result;
     }
+
+    @Override
+    public Result modifyUserRole(UserDTO userDTO) throws Exception {
+
+        return null;
+    }
+
 }
