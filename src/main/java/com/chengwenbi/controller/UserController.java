@@ -4,28 +4,29 @@ import com.chengwenbi.common.Result;
 import com.chengwenbi.common.exception.ServiceException;
 import com.chengwenbi.common.exception.ValidateParamsException;
 import com.chengwenbi.constant.SessionConstants;
+import com.chengwenbi.constant.UserState;
 import com.chengwenbi.controller.base.BaseController;
-import com.chengwenbi.domain.UserDO;
-import com.chengwenbi.domain.UserDTO;
+import com.chengwenbi.domain.dto.UserDTO;
+import com.chengwenbi.domain.entity.UserDO;
+import com.chengwenbi.domain.vo.UserVO;
 import com.chengwenbi.service.UserService;
+import com.chengwenbi.util.MD5Util;
+import com.chengwenbi.util.StringUtil;
 import com.chengwenbi.util.ValidParamUtil;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-/**
- * @description:
- * @author: chengwenbi
- * @date: 2017/12/17 13:18
- */
 @Controller
 @RequestMapping("/user")
 public class UserController extends BaseController {
@@ -36,15 +37,17 @@ public class UserController extends BaseController {
     private UserService userService;
 
     @ResponseBody
-    @RequestMapping(value = "/login")
-    public Result login(HttpSession session, UserDTO userDTO) {
+    @RequestMapping("/login")
+    public Result login(UserDTO userDTO, HttpSession session) {
         try {
             ValidParamUtil.validNotNull(userDTO.getEmail(), userDTO.getPassword());
             //验证登录
-            userService.login(userDTO);
+            result = userService.login(userDTO);
             //正确存入session
-            session.setAttribute(SessionConstants.USER_KEY, userDTO);
-            result.modifyResult(true, userDTO, "登录成功");
+            UserDO data = (UserDO) result.getData();
+            session.setAttribute(SessionConstants.USER_KEY, data);
+            result = new Result();
+            result.modifyResult(true, "登录成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("登录警告异常  " + userDTO.toString(), e);
             result.modifyResult(false, e.getMessage());
@@ -90,13 +93,22 @@ public class UserController extends BaseController {
         UserDO qo = new UserDO();
         try {
             UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
+            ValidParamUtil.validNotNull(userDO);
             userDTO.setCreateId(userDO.getId());
-            userDTO.setCreateName(userDTO.getName());
+            userDTO.setCreateName(userDO.getName());
             userDTO.setCreateTime(new Date());
-            //状态默认未删除
+            userDTO.setModifyId(userDO.getId());
+            userDTO.setModifyName(userDO.getName());
+            userDTO.setModifyTime(new Date());            //状态默认未删除
             BeanUtils.copyProperties(qo, userDTO);
+            qo.setId(StringUtil.uuid());
+            //设置默认密码
+            qo.setPassword(MD5Util.getMD5("111111"));
             userService.add(qo);
-            result.modifyResult(true,qo,"添加成功");
+            //DO 转 VO
+            UserVO vo = new UserVO();
+            BeanUtils.copyProperties(vo,qo);
+            result.modifyResult(true, vo, "添加成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("添加用户异常  " + qo.toString(), e);
             result.modifyResult(false, e.getMessage());
@@ -109,9 +121,10 @@ public class UserController extends BaseController {
 
     @ResponseBody
     @RequestMapping(value = "/modify")
-    public Result modifyUser(HttpSession session,UserDTO userDTO) {
+    public Result modifyUser(HttpSession session, UserDTO userDTO) {
         UserDO qo = new UserDO();
         try {
+            ValidParamUtil.validNotNull(userDTO.getEmail());
             UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
             userDTO.setModifyId(userDO.getId());
             userDTO.setModifyName(userDO.getName());
@@ -132,12 +145,13 @@ public class UserController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/drop")
     public Result dropUser(UserDTO userDTO) {
-        UserDO qo = new UserDO();
+        UserDO qo = null;
         try {
+            qo=userService.findByEmail(userDTO);
             BeanUtils.copyProperties(qo, userDTO);
-            qo.setState(1);
+            qo.setState(UserState.BLOCKED);
             userService.modify(qo);
-            result.modifyResult(true,qo,"用户删除成功");
+            result.modifyResult(true,"用户删除成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("删除用户异常  " + qo.toString(), e);
             result.modifyResult(false, e.getMessage());
@@ -150,10 +164,23 @@ public class UserController extends BaseController {
 
     @ResponseBody
     @RequestMapping(value = "/find")
-    public Result findUser(UserDTO userDTO) {
+    public Result findUser(UserDTO userDTO, @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo, @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        Result result = new Result();
         try {
-            List<UserDO> userList = userService.findByParams(userDTO);
-            result.modifyResult(true,userList,"用户列表查询成功");
+            //dto 转 do
+            UserDO userDO = new UserDO();
+            BeanUtils.copyProperties(userDO, userDTO);
+            PageHelper.startPage(pageNo, pageSize);
+            List<UserDO> userList = userService.findByParams(userDO);
+            //do 转 vo
+            List<UserVO> voList = new ArrayList<>();
+            for (UserDO user : userList) {
+                UserVO vo = new UserVO();
+                BeanUtils.copyProperties(vo,user);
+                vo.setState(UserState.getNameByState(user.getState()));
+                voList.add(vo);
+            }
+            result.modifyResult(true, voList, "用户列表查询成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("查询用户异常  ", e);
             result.modifyResult(false, e.getMessage());

@@ -61,7 +61,7 @@ public abstract class BaseInterfaceServiceImpl<Entity extends BaseEntity> implem
     }
 
     /**
-     * 抽象方法需要实现，  得到基础服务接口
+     * 抽象方法需要实现,得到基础服务接口
      * @return
      */
     public abstract BaseInterfaceMapper<Entity> getBaseInterfaceMapper();

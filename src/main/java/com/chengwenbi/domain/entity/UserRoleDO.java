@@ -1,5 +1,10 @@
-package com.chengwenbi.domain;
+package com.chengwenbi.domain.entity;
 
+/**
+ * @description:用户角色关系表实体
+ * @author: chengwenbi
+ * @date:   2018/3/13 17:05
+ */
 public class UserRoleDO {
 
     private String id;

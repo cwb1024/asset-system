@@ -4,18 +4,15 @@ import com.chengwenbi.common.Result;
 import com.chengwenbi.common.exception.ServiceException;
 import com.chengwenbi.dao.UserMapper;
 import com.chengwenbi.dao.base.BaseInterfaceMapper;
-import com.chengwenbi.domain.UserDO;
-import com.chengwenbi.domain.UserDTO;
+import com.chengwenbi.domain.dto.UserDTO;
+import com.chengwenbi.domain.entity.UserDO;
 import com.chengwenbi.service.UserService;
 import com.chengwenbi.service.base.BaseInterfaceServiceImpl;
 import com.chengwenbi.util.MD5Util;
 import com.chengwenbi.util.ValidParamUtil;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -39,7 +36,7 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
         if (!userDO.getPassword().equals(MD5Util.getMD5(userDTO.getPassword()))) {
             throw new ServiceException("用户名密码不匹配,登录失败");
         }
-        return new Result(true,"登录成功");
+        return new Result(true,"登录成功",userDO);
     }
 
     @Override
@@ -56,9 +53,11 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
         }
         //覆盖原密码，进行更新
         UserDO qo = new UserDO();
-        qo.setPassword(userDTO.getNewPassword());
+        //对密码进行加密
+        String newPassword = MD5Util.getMD5(userDTO.getNewPassword());
+        qo.setPassword(newPassword);
         qo.setEmail(userDO.getEmail());
-        int res = userMapper.update(userDO);
+        int res = userMapper.update(qo);
         Result result = new Result();
         if (res != 0) {
             result.modifyResult(true, "密码修改成功");
@@ -72,6 +71,17 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
     public Result modifyUserRole(UserDTO userDTO) throws Exception {
 
         return null;
+    }
+
+    @Override
+    public UserDO findByEmail(UserDTO userDTO) throws Exception {
+        String email = userDTO.getEmail();
+        ValidParamUtil.validNotNull(email);
+        UserDO userDO = userMapper.findByEmail(email);
+        if (userDO == null) {
+            throw new ServiceException("用户不存在");
+        }
+        return userDO;
     }
 
 }

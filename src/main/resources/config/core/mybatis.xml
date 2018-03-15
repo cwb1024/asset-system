@@ -3,11 +3,19 @@
         "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <!-- 格式化日志 -->
     <settings>
         <setting name="logImpl" value="LOG4J"/>
     </settings>
+    <!-- 别名 -->
     <typeAliases>
-        <package name="com.chengwenbi.domain"/>
+        <package name="com.chengwenbi.domain.entity"/>
         <package name="com.chengwenbi.common"/>
     </typeAliases>
+    <!-- 分页插件 -->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
 </configuration>

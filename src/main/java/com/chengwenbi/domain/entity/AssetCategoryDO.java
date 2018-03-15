@@ -1,5 +1,9 @@
-package com.chengwenbi.domain;
-
+package com.chengwenbi.domain.entity;
+/**
+ * @description:资产类别关系表实体
+ * @author: chengwenbi
+ * @date:   2018/3/13 17:01
+ */
 public class AssetCategoryDO {
 
     private String id;

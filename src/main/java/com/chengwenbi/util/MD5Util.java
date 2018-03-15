@@ -41,4 +41,9 @@ public class MD5Util {
 	    return getMD5(str).substring(8, 24);
 	}
 
+	public static void main(String[] args) {
+		String password = "111111";
+		System.out.println(MD5Util.getMD5(password));
+	}
+
 }
