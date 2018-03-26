@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+        "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans default-autowire="byName" default-lazy-init="false">
+    <bean id="configMap" class="com.chengwenbi.config.ConfigMap">
+
+        <!--角色列表-->
+        <property name="roleList">
+            <list>
+                <bean class="com.chengwenbi.config.BaseItemMap">
+                    <property name="id" value="1"/>
+                    <property name="name" value="普通用户"/>
+                </bean>
+                <bean class="com.chengwenbi.config.BaseItemMap">
+                    <property name="id" value="2"/>
+                    <property name="name" value="超级管理员"/>
+                </bean>
+                <bean class="com.chengwenbi.config.BaseItemMap">
+                    <property name="id" value="3"/>
+                    <property name="name" value="资产管理员"/>
+                </bean>
+            </list>
+        </property>
+
+    </bean>
+</beans>

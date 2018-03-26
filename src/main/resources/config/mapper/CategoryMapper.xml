@@ -1,101 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.chengwenbi.dao.UserMapper">
+<mapper namespace="com.chengwenbi.dao.CategoryMapper">
 
-   <!-- <resultMap id="BaseResult" type="BaseEntity">
-        <id property="id" column="id"/>
-        <result property="createId" column="create_id"/>
-        <result property="createName" column="create_name"/>
-        <result property="createTime" column="create_time"/>
-        <result property="modifyId" column="modify_id"/>
-        <result property="modifyName" column="modify_name"/>
-        <result property="modifyTime" column="modify_time"/>
-    </resultMap>
-
-    <resultMap id="result" type="UserDO" extends="BaseResult">
-        <result property="name" column="name"/>
-        <result property="email" column="email"/>
-        <result property="password" column="password"/>
-        <result property="identity" column="identity"/>
-        <result property="state" column="state"/>
+    <resultMap id="result" type="CategoryDO">
+       <id property="id" column="id"/>
+       <result property="name" column="name"/>
+       <result property="parentId" column="parent_id"/>
     </resultMap>
 
     <sql id="All_Column_List">
-        id,name,email,password,identity,state,create_id,create_name,create_time,modify_id,modify_name,modify_time
+        id,name,parent_id
     </sql>
 
-    &lt;!&ndash; sql 查询条件 &ndash;&gt;
+    <!-- sql 查询条件 -->
     <sql id="sql_query">
         <where>
-            <if test=" email != null and email != ''">
-                and email = #{email}
+            <if test=" id != null and id != ''">
+                and id = #{id}
             </if>
-            <if test=" password != null and password != ''">
-                and password = #{password}
+            <if test=" name != null and name != ''">
+                and name = #{name}
             </if>
-            <if test="identity != null and identity != ''">
-                and identity = #{identity}
+            <if test="parentId != null and parentId != ''">
+                and parent_id = #{parentId}
             </if>
         </where>
     </sql>
 
     <select id="findAll" resultMap="result">
-        select * from user
+        select * from category
     </select>
 
-    <insert id="save" parameterType="com.chengwenbi.domain.UserDO">
+    <insert id="save" parameterType="com.chengwenbi.domain.entity.CategoryDO">
+       insert into category
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">id,</if>
             <if test="name != null and name != ''">name,</if>
-            <if test="email != null and email != ''">email,</if>
-            <if test="password != null and password != ''">password,</if>
-            <if test="identity != null and identity != ''">identity,</if>
-            <if test="state != null and state != ''">state</if>
-            <if test="createId != null">create_id,</if>
-            <if test="createName != null">create_name,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="modifyId != null">modify_id,</if>
-            <if test="modifyName != null">modify_name,</if>
-            <if test="modifyTime != null">modify_time,</if>
+            <if test="parentId != null and parentId != ''">parent_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">#{id},</if>
             <if test="name != null and name != ''">#{name},</if>
-            <if test="email != null and email != ''">#{email},</if>
-            <if test="password != null and password != ''">#{password},</if>
-            <if test="identity != null and identity != ''">#{identity},</if>
-            <if test="state != null and state != ''">#{state}</if>
-            <if test="createId != null">#{createId},</if>
-            <if test="createName != null">#{createName},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="modifyId != null">#{modifyId},</if>
-            <if test="modifyName != null">#{modifyName},</if>
-            <if test="modifyTime != null">#modifyTime},</if>
+            <if test="parentId != null and parentId != ''">#{parentId},</if>
         </trim>
     </insert>
 
-    <update id="update" parameterType="com.chengwenbi.domain.UserDO">
-        update user
+    <update id="update" parameterType="com.chengwenbi.domain.entity.CategoryDO">
+        update category
         <set>
-            <if test="name != null and name != ''">name = #{name}</if>
-            <if test="email != null and email != ''">email=#{email}</if>
-            <if test="password != null and password != ''">password=#{password}</if>
-            <if test="identity != null and identity != ''">identity=#{identity}</if>
-            <if test="state != null and state != ''">state=#{state}</if>
-            <if test="createId != null">create_id=#{createId}</if>
-            <if test="createName != null">create_name=#{creareName}</if>
-            <if test="createTime != null">create_time=#{createTime}</if>
-            <if test="modifyId != null">modify_id=#{modifyId}</if>
-            <if test="modifyName != null">modify_name#{modifyName}</if>
-            <if test="modifyTime != null">modify_time=#{modifyTime}</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="parentId != null and parentId != ''">parent_id = #{parentId},</if>
         </set>
-        where email=#{email}
+        where id=#{id}
     </update>
 
-    <select id="findByEmail" parameterType="java.lang.String" resultMap="result">
-        select
-        <include refid="All_Column_List"/>
-        from user
-        where email=#{email}
-    </select>-->
+   <select id="findById" parameterType="java.lang.String" resultMap="result">
+      select * from category where id=#{id}
+   </select>
+
+   <delete id="delete" parameterType="java.lang.String">
+      delete from category where id=#{id}
+   </delete>
 </mapper>

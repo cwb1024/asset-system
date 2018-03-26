@@ -1,18 +1,18 @@
-package com.chengwenbi.domain.entity;
+package com.chengwenbi.domain.dto;
 
 import com.chengwenbi.common.BaseEntity;
 
-/**
- * @description:角色表实体
- * @author: chengwenbi
- * @date:   2018/3/13 17:04
- */
-public class RoleDO extends BaseEntity {
+import java.util.List;
+
+public class RoleDTO extends BaseEntity {
+
     private String name;
     private Integer state;
     private Integer sort;
     private String remark;
     private Integer isDefault;//是否默认选中
+    private List<String> authorityList;
+    private String userId;
 
     public String getName() {
         return name;
@@ -52,5 +52,21 @@ public class RoleDO extends BaseEntity {
 
     public void setIsDefault(Integer isDefault) {
         this.isDefault = isDefault;
+    }
+
+    public List<String> getAuthorityList() {
+        return authorityList;
+    }
+
+    public void setAuthorityList(List<String> authorityList) {
+        this.authorityList = authorityList;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

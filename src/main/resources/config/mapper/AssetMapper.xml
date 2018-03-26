@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.chengwenbi.dao.UserMapper">
+<mapper namespace="com.chengwenbi.dao.AssetMapper">
 
-   <!-- <resultMap id="BaseResult" type="BaseEntity">
+    <resultMap id="BaseResult" type="BaseEntity">
         <id property="id" column="id"/>
         <result property="createId" column="create_id"/>
         <result property="createName" column="create_name"/>
@@ -12,45 +12,72 @@
         <result property="modifyTime" column="modify_time"/>
     </resultMap>
 
-    <resultMap id="result" type="UserDO" extends="BaseResult">
-        <result property="name" column="name"/>
-        <result property="email" column="email"/>
-        <result property="password" column="password"/>
-        <result property="identity" column="identity"/>
-        <result property="state" column="state"/>
+    <resultMap id="result" type="AssetInfoDO" extends="BaseResult">
+        <result property="assetNo" column="asset_no"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="money" column="money"/>
+        <result property="purchaseTime" column="purchase_time"/>
+        <result property="status" column="status"/>
+        <result property="account" column="account"/>
+        <result property="producers" column="producers"/>
+        <result property="produceDate" column="produce_date"/>
     </resultMap>
 
     <sql id="All_Column_List">
-        id,name,email,password,identity,state,create_id,create_name,create_time,modify_id,modify_name,modify_time
+        id,asset_no,category_id,category_name,money,purchase_time,status,account,producers,produce_date,create_id,create_name,create_time,modify_id,modify_name,modify_time
     </sql>
 
-    &lt;!&ndash; sql 查询条件 &ndash;&gt;
+    <!-- sql 查询条件 -->
     <sql id="sql_query">
         <where>
-            <if test=" email != null and email != ''">
-                and email = #{email}
+            <if test=" assetNo != null and assetNo != ''">
+                and asset_no = #{assetNo}
             </if>
-            <if test=" password != null and password != ''">
-                and password = #{password}
+            <if test=" categoryId != null and categoryId != ''">
+                and category_id = #{categoryId}
             </if>
-            <if test="identity != null and identity != ''">
-                and identity = #{identity}
+            <if test=" categoryName != null and categoryName != ''">
+                and category_name = #{categoryName}
+            </if>
+            <if test="money != null">
+                and money =#{money}
+            </if>
+            <if test="purchaseTime != null">
+                and purchase_time =#{purchaseTime}
+            </if>
+            <if test="status != null">
+                and status =#{status}
+            </if>
+            <if test="account != null">
+                and account =#{account}
+            </if>
+            <if test="producers != null and producers !=''">
+                and producers =#{producers}
+            </if>
+            <if test="produceDate != null">
+                and produce_date =#{produceDate}
             </if>
         </where>
     </sql>
 
     <select id="findAll" resultMap="result">
-        select * from user
+        select * from asset_info
     </select>
 
-    <insert id="save" parameterType="com.chengwenbi.domain.UserDO">
+    <insert id="save" parameterType="com.chengwenbi.domain.entity.AssetInfoDO">
+        insert into asset_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">id,</if>
-            <if test="name != null and name != ''">name,</if>
-            <if test="email != null and email != ''">email,</if>
-            <if test="password != null and password != ''">password,</if>
-            <if test="identity != null and identity != ''">identity,</if>
-            <if test="state != null and state != ''">state</if>
+            <if test=" assetNo != null and assetNo != ''">asset_no,</if>
+            <if test=" categoryId != null and categoryId != ''">category_id,</if>
+            <if test=" categoryName != null and categoryName != ''">category_name,</if>
+            <if test="money != null">money,</if>
+            <if test="purchaseTime != null">purchase_time,</if>
+            <if test="status != null">status,</if>
+            <if test="account != null">account,</if>
+            <if test="producers != null and producers !=''">producers,</if>
+            <if test="produceDate != null">produce_date,</if>
             <if test="createId != null">create_id,</if>
             <if test="createName != null">create_name,</if>
             <if test="createTime != null">create_time,</if>
@@ -60,42 +87,44 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">#{id},</if>
-            <if test="name != null and name != ''">#{name},</if>
-            <if test="email != null and email != ''">#{email},</if>
-            <if test="password != null and password != ''">#{password},</if>
-            <if test="identity != null and identity != ''">#{identity},</if>
-            <if test="state != null and state != ''">#{state}</if>
+            <if test=" assetNo != null and assetNo != ''">#{assetNo},</if>
+            <if test=" categoryId != null and categoryId != ''">#{categoryId},</if>
+            <if test=" categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="money != null">#{money},</if>
+            <if test="purchaseTime != null">#{purchaseTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="account != null">#{account},</if>
+            <if test="producers != null and producers !=''">#{producers},</if>
+            <if test="produceDate != null">#{produceDate},</if>
             <if test="createId != null">#{createId},</if>
             <if test="createName != null">#{createName},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="modifyId != null">#{modifyId},</if>
             <if test="modifyName != null">#{modifyName},</if>
-            <if test="modifyTime != null">#modifyTime},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
         </trim>
     </insert>
 
-    <update id="update" parameterType="com.chengwenbi.domain.UserDO">
-        update user
+    <update id="update" parameterType="com.chengwenbi.domain.entity.AssetInfoDO">
+        update asset_info
         <set>
-            <if test="name != null and name != ''">name = #{name}</if>
-            <if test="email != null and email != ''">email=#{email}</if>
-            <if test="password != null and password != ''">password=#{password}</if>
-            <if test="identity != null and identity != ''">identity=#{identity}</if>
-            <if test="state != null and state != ''">state=#{state}</if>
-            <if test="createId != null">create_id=#{createId}</if>
-            <if test="createName != null">create_name=#{creareName}</if>
-            <if test="createTime != null">create_time=#{createTime}</if>
-            <if test="modifyId != null">modify_id=#{modifyId}</if>
-            <if test="modifyName != null">modify_name#{modifyName}</if>
-            <if test="modifyTime != null">modify_time=#{modifyTime}</if>
+            <if test=" assetNo != null and assetNo != ''">asset_no=#{assetNo},</if>
+            <if test=" categoryId != null and categoryId != ''">category_id=#{categoryId},</if>
+            <if test=" categoryName != null and categoryName != ''">category_name=#{categoryName},</if>
+            <if test="money != null">money=#{money},</if>
+            <if test="purchaseTime != null">purchase_time=#{purchaseTime},</if>
+            <if test="status != null">status=#{status},</if>
+            <if test="account != null">account=#{account},</if>
+            <if test="producers != null and producers !=''">producers=#{producers},</if>
+            <if test="produceDate != null">produce_date=#{produceDate},</if>
+            <if test="createId != null">create_id=#{createId},</if>
+            <if test="createName != null">create_name=#{createName},</if>
+            <if test="createTime != null">create_time=#{createTime},</if>
+            <if test="modifyId != null">modify_id=#{modifyId},</if>
+            <if test="modifyName != null">modify_name=#{modifyName},</if>
+            <if test="modifyTime != null">modify_time=#{modifyTime},</if>
         </set>
-        where email=#{email}
+        where id=#{id}
     </update>
 
-    <select id="findByEmail" parameterType="java.lang.String" resultMap="result">
-        select
-        <include refid="All_Column_List"/>
-        from user
-        where email=#{email}
-    </select>-->
 </mapper>

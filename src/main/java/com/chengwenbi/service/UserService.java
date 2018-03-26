@@ -14,4 +14,6 @@ public interface UserService extends IBaseInterfaceService<UserDO> {
     Result modifyUserRole(UserDTO userDTO) throws Exception;
 
     UserDO findByEmail(UserDTO userDTO) throws Exception;
+
+    boolean verifyEmail(String email) throws Exception;
 }

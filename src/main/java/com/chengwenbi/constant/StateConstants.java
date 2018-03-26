@@ -2,7 +2,7 @@ package com.chengwenbi.constant;
 
 import com.chengwenbi.util.ValidParamUtil;
 
-public class UserState {
+public class StateConstants {
 
     /*
      * normal 正常状态

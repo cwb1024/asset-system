@@ -3,8 +3,10 @@ package com.chengwenbi.controller;
 import com.chengwenbi.common.Result;
 import com.chengwenbi.common.exception.ServiceException;
 import com.chengwenbi.common.exception.ValidateParamsException;
+import com.chengwenbi.config.BaseItemMap;
+import com.chengwenbi.config.ConfigMap;
 import com.chengwenbi.constant.SessionConstants;
-import com.chengwenbi.constant.UserState;
+import com.chengwenbi.constant.StateConstants;
 import com.chengwenbi.controller.base.BaseController;
 import com.chengwenbi.domain.dto.UserDTO;
 import com.chengwenbi.domain.entity.UserDO;
@@ -104,6 +106,8 @@ public class UserController extends BaseController {
             qo.setId(StringUtil.uuid());
             //设置默认密码
             qo.setPassword(MD5Util.getMD5("111111"));
+            //验证邮箱是否已经存在
+            userService.verifyEmail(userDTO.getEmail());
             userService.add(qo);
             //DO 转 VO
             UserVO vo = new UserVO();
@@ -149,7 +153,7 @@ public class UserController extends BaseController {
         try {
             qo=userService.findByEmail(userDTO);
             BeanUtils.copyProperties(qo, userDTO);
-            qo.setState(UserState.BLOCKED);
+            qo.setState(StateConstants.BLOCKED);
             userService.modify(qo);
             result.modifyResult(true,"用户删除成功");
         } catch (ServiceException | ValidateParamsException e) {
@@ -177,7 +181,7 @@ public class UserController extends BaseController {
             for (UserDO user : userList) {
                 UserVO vo = new UserVO();
                 BeanUtils.copyProperties(vo,user);
-                vo.setState(UserState.getNameByState(user.getState()));
+                vo.setState(StateConstants.getNameByState(user.getState()));
                 voList.add(vo);
             }
             result.modifyResult(true, voList, "用户列表查询成功");
@@ -191,16 +195,34 @@ public class UserController extends BaseController {
         return result;
     }
 
+    /**
+     * 参数：identifyId，email,设置用户角色
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/setUserRole")
-    public Result setUserRole() {
-
+    public Result setUserRole(UserDTO userDTO) {
+        String email = userDTO.getEmail();
+        try {
+            ValidParamUtil.validNotNull(email, userDTO.getIdentityId());
+            UserDO userDO = userService.findByEmail(userDTO);
+            BeanUtils.copyProperties(userDO, userDTO);
+            userDO.setIdentityName(ConfigMap.getRoleNameById(userDTO.getIdentityId()));
+            userService.modify(userDO);
+            result.modifyResult(true, "设置用户角色成功");
+        } catch (Exception e) {
+            log.error("设置用户角色失败",e);
+            result.modifyResult(false, "设置用户角色失败");
+        }
         return result;
     }
 
+
     @ResponseBody
-    @RequestMapping(value = "/modifyUserRole")
-    public Result modifyUserRole() {
+    @RequestMapping(value = "/findRoleList")
+    public Result findRoleList(){
+        List<BaseItemMap> roleList = ConfigMap.getRoleList();
+        result.modifyResult(true, roleList, "获取角色列表成功");
         return result;
     }
 }

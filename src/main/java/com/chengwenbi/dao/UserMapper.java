@@ -5,6 +5,8 @@ import com.chengwenbi.domain.entity.UserDO;
 
 public interface UserMapper extends BaseInterfaceMapper<UserDO> {
 
-    public UserDO findByEmail(String email);
+    UserDO findByEmail(String email);
+
+    Integer verifyEmail(String email);
 
 }

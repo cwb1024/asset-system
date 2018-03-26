@@ -140,4 +140,8 @@
         from user
         <include refid="sql_query"/>
     </select>
+
+    <select id="verifyEmail" parameterType="java.lang.String">
+        select count(1) from user where email=#{email}
+    </select>
 </mapper>
