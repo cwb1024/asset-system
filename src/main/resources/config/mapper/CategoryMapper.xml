@@ -3,13 +3,17 @@
 <mapper namespace="com.chengwenbi.dao.CategoryMapper">
 
     <resultMap id="result" type="CategoryDO">
-       <id property="id" column="id"/>
-       <result property="name" column="name"/>
-       <result property="parentId" column="parent_id"/>
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="spec" column="spec"/>
+        <result property="model" column="model"/>
+        <result property="brand" column="brand"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <sql id="All_Column_List">
-        id,name,parent_id
+        id,name,spec,model,brand,create_time,parent_id
     </sql>
 
     <!-- sql 查询条件 -->
@@ -32,16 +36,24 @@
     </select>
 
     <insert id="save" parameterType="com.chengwenbi.domain.entity.CategoryDO">
-       insert into category
+        insert into category
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">id,</if>
             <if test="name != null and name != ''">name,</if>
             <if test="parentId != null and parentId != ''">parent_id,</if>
+            <if test="spec != null and spec !=''">spec,</if>
+            <if test="model != null and model !=''">model,</if>
+            <if test="brand != null and brand !=''">brand,</if>
+            <if test="createTime != null">create_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">#{id},</if>
             <if test="name != null and name != ''">#{name},</if>
             <if test="parentId != null and parentId != ''">#{parentId},</if>
+            <if test="spec != null and spec != ''">#{spec},</if>
+            <if test="model != null and model != ''">#{model},</if>
+            <if test="brand != null and brand != ''">#{brand},</if>
+            <if test="createTime != null">#{createTime},</if>
         </trim>
     </insert>
 
@@ -50,15 +62,26 @@
         <set>
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="parentId != null and parentId != ''">parent_id = #{parentId},</if>
+            <if test="spec != null and spec != ''">spec=#{spec},</if>
+            <if test="model != null and model != ''">model=#{model},</if>
+            <if test="createTime != null">create_time =#{createTime},</if>
+            <if test="brand != null and brand !=''">brand=#{brand}</if>
         </set>
         where id=#{id}
     </update>
 
-   <select id="findById" parameterType="java.lang.String" resultMap="result">
+    <select id="findById" parameterType="java.lang.String" resultMap="result">
       select * from category where id=#{id}
    </select>
 
-   <delete id="delete" parameterType="java.lang.String">
+    <delete id="delete" parameterType="java.lang.String">
       delete from category where id=#{id}
    </delete>
+
+    <select id="findByParams" resultMap="result">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM category
+        <include refid="sql_query"/>
+    </select>
 </mapper>

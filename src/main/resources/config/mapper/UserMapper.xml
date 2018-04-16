@@ -58,6 +58,7 @@
             <if test="identityName != null and identityName != ''">
                 and identity_name=#{identityName}
             </if>
+            and state=0
         </where>
     </sql>
 
@@ -141,7 +142,7 @@
         <include refid="sql_query"/>
     </select>
 
-    <select id="verifyEmail" parameterType="java.lang.String">
+    <select id="verifyEmail" parameterType="java.lang.String" resultType="java.lang.Integer">
         select count(1) from user where email=#{email}
     </select>
 </mapper>

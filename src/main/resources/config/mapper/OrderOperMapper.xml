@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chengwenbi.dao.OrderOperMapper">
+
+    <resultMap id="result" type="AssetOperDO">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="beforeStatus" column="before_status"/>
+        <result property="afterStatus" column="after_status"/>
+        <result property="type" column="type"/>
+        <result property="operationTime" column="operation_time"/>
+        <result property="createId" column="creater_id"/>
+        <result property="createName" column="creater_name"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="All_Column_List">
+        id,order_id,creater_id,creater_name,create_time,type,before_status,after_status,operation_time
+    </sql>
+
+    <!-- sql 查询条件 -->
+    <sql id="sql_query">
+        <where>
+            <if test="orderId != null and orderId != ''">
+                and order_id=#{orderId}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="beforeStatus != null">
+                and before_status = #{beforeStatus}
+            </if>
+            <if test="afterStatus != null">
+                and category_name = #{categoryName}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="result">
+        select * from asset_operation
+    </select>
+
+    <insert id="save" parameterType="com.chengwenbi.domain.entity.AssetOperDO">
+        insert into asset_operation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">id,</if>
+            <if test="type != null">type,</if>
+            <if test="orderId != null and orderId !=''">order_id,</if>
+            <if test="beforeStatus != null">before_status,</if>
+            <if test="afterStatus != null">after_status,</if>
+            <if test="createId != null and createId != ''">creater_id,</if>
+            <if test="createName != null and createName !=''">creater_name,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">#{id},</if>
+            <if test="type != null">#{type},</if>
+            <if test="orderId != null and orderId != ''">#{orderId},</if>
+            <if test="beforeStatus != null">#{beforeStatus},</if>
+            <if test="afterStatus != null">#{afterStatus},</if>
+            <if test="createId != null">#{createId},</if>
+            <if test="createName != null">#{createName},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.chengwenbi.domain.entity.AssetOperDO">
+        update asset_operation
+        <set>
+            <if test="orderId != null and orderId != ''">order_id=#{orderId},</if>
+            <if test="type != null">type=#{type},</if>
+            <if test="beforeStatus != null">before_status=#{beforeStatus},</if>
+            <if test="afterStatus != null">after_status=#{afterStatus},</if>
+            <if test="operationTime != null">operation_time=#{operationTime},</if>
+            <if test="createId != null and createId !=''">creater_id=#{createId},</if>
+            <if test="createName != null and createName != ''">creater_name=#{createName},</if>
+            <if test="createTime != null">create_time#{createTime},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <select id="findByParams" resultMap="result">
+        select
+        <include refid="All_Column_List"/>
+        from asset_operation
+        <include refid="sql_query"/>
+        order by create_time asc
+    </select>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into order_item(id,order_id,asset_id,name,category_id,category_name,account)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.orderId},#{item.assetId},#{item.name},#{item.categoryId},#{item.categoryName},#{item.account})
+        </foreach>
+    </insert>
+
+</mapper>

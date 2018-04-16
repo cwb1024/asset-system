@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping("/role")
+@RequestMapping("/api/role")
 public class RoleController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(RoleController.class);

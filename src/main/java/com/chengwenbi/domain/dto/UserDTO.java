@@ -1,14 +1,13 @@
 package com.chengwenbi.domain.dto;
 
-import com.chengwenbi.common.BaseEntity;
 
-public class UserDTO extends BaseEntity{
+public class UserDTO {
     private String name;
     private String email;
     private String password;
     private String newPassword;
-    private Integer identityId;
-    private Integer state;
+    private String identityId;
+    private String state;
     private String identityName;
 
 
@@ -44,20 +43,20 @@ public class UserDTO extends BaseEntity{
         this.newPassword = newPassword;
     }
 
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
-    public Integer getIdentityId() {
+    public String getIdentityId() {
         return identityId;
     }
 
-    public void setIdentityId(Integer identityId) {
+    public void setIdentityId(String identityId) {
         this.identityId = identityId;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getIdentityName() {

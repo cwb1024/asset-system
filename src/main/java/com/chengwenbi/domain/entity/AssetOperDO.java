@@ -1,5 +1,7 @@
 package com.chengwenbi.domain.entity;
 
+import com.chengwenbi.common.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -7,12 +9,9 @@ import java.util.Date;
  * @description:资产操作表实体
  * @date:   2018/3/13 17:02
  */
-public class AssetOperDO {
+public class AssetOperDO extends BaseEntity {
     private String orderId;//订单id
     private Integer type;//操作类型
-    private String createrId;//创建人id
-    private String createrName;//创建人姓名
-    private Date createTime;//创建时间
     private Integer beforeStatus;//之前状态
     private Integer afterStatus;//之后状态
     private String operationTime;//操作时间
@@ -33,29 +32,6 @@ public class AssetOperDO {
         this.type = type;
     }
 
-    public String getCreaterId() {
-        return createrId;
-    }
-
-    public void setCreaterId(String createrId) {
-        this.createrId = createrId;
-    }
-
-    public String getCreaterName() {
-        return createrName;
-    }
-
-    public void setCreaterName(String createrName) {
-        this.createrName = createrName;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 
     public Integer getBeforeStatus() {
         return beforeStatus;
@@ -80,4 +56,5 @@ public class AssetOperDO {
     public void setOperationTime(String operationTime) {
         this.operationTime = operationTime;
     }
+
 }

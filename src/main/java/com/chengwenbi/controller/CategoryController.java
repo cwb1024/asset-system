@@ -1,30 +1,31 @@
 package com.chengwenbi.controller;
 
+import com.chengwenbi.common.PageBean;
 import com.chengwenbi.common.Result;
 import com.chengwenbi.common.exception.ServiceException;
-import com.chengwenbi.constant.SessionConstants;
 import com.chengwenbi.controller.base.BaseController;
 import com.chengwenbi.domain.dto.CategoryDTO;
-import com.chengwenbi.domain.dto.UserDTO;
 import com.chengwenbi.domain.entity.CategoryDO;
-import com.chengwenbi.domain.entity.UserDO;
 import com.chengwenbi.service.CategoryService;
 import com.chengwenbi.util.StringUtil;
 import com.chengwenbi.util.ValidParamUtil;
+import com.github.pagehelper.PageHelper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("/category")
+@RequestMapping("/api/category")
 public class CategoryController extends BaseController {
 
     private static Logger log = LoggerFactory.getLogger(CategoryController.class);
@@ -40,8 +41,8 @@ public class CategoryController extends BaseController {
             String id = StringUtil.uuid();
             CategoryDO categoryDO = new CategoryDO();
             categoryDO.setId(id);
-            categoryDO.setName(categoryDTO.getName());
-            categoryDO.setParentId(categoryDTO.getParentId());
+            BeanUtils.copyProperties(categoryDO, categoryDTO);
+            categoryDO.setCreateTime(new Date());
             categoryService.add(categoryDO);
         } catch (ServiceException e) {
             log.warn("添加类别警告异常", e);
@@ -65,8 +66,7 @@ public class CategoryController extends BaseController {
                 throw new ServiceException("当前类别不存在");
             }
             //更新操作
-            categoryDO.setName(categoryDTO.getName());
-            categoryDO.setParentId(categoryDTO.getParentId());
+            BeanUtils.copyProperties(categoryDO, categoryDTO);
             categoryService.modify(categoryDO);
             result. modifyResult(true, "更新类别成功");
         } catch (ServiceException e) {
@@ -101,10 +101,21 @@ public class CategoryController extends BaseController {
 
     @ResponseBody
     @RequestMapping("/findAll")
-    public Result findCategory(){
+    public Result findCategory(CategoryDTO categoryDTO,@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo, @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         try {
-            List<CategoryDO> doList = categoryService.findAll();
-            result.modifyResult(true,doList,"获取资产类别成功");
+            CategoryDO categoryDO = new CategoryDO();
+            BeanUtils.copyProperties(categoryDO, categoryDTO);
+            PageHelper.startPage(pageNo, pageSize);
+            List<CategoryDO> doList = categoryService.findByParams(categoryDO);
+            PageBean<CategoryDO> pageBean = new PageBean<>(doList);
+            //分装map
+            Map<String, Object> map = new HashMap<>();
+            map.put("data", doList);
+            map.put("total", pageBean.getTotal());
+            map.put("pageSize", pageBean.getPageSize());
+            map.put("pageNo", pageBean.getPageNum());
+            map.put("page", pageBean.getPages());
+            result.modifyResult(true,map,"获取资产类别成功");
         } catch (ServiceException e) {
             log.warn("查询类别异常", e);
             result.modifyResult(false,"查询类别异常");

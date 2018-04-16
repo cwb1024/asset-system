@@ -10,11 +10,11 @@ public class BaseEntity implements Serializable {
     private String id;
     private String createId;
     private String createName;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss")
+    /*@JSONField(format = "yyyy-MM-dd hh:mm:ss")*/
     private Date createTime;
     private String modifyId;
     private String modifyName;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss")
+    /*@JSONField(format = "yyyy-MM-dd hh:mm:ss")*/
     private Date modifyTime;
 
     public String getId() {

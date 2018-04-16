@@ -1,5 +1,6 @@
 package com.chengwenbi.controller;
 
+import com.chengwenbi.common.PageBean;
 import com.chengwenbi.common.Result;
 import com.chengwenbi.common.exception.ServiceException;
 import com.chengwenbi.common.exception.ValidateParamsException;
@@ -21,16 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -49,7 +49,9 @@ public class UserController extends BaseController {
             UserDO data = (UserDO) result.getData();
             session.setAttribute(SessionConstants.USER_KEY, data);
             result = new Result();
-            result.modifyResult(true, "登录成功");
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(userVO, data);
+            result.modifyResult(true, userVO,"登录成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("登录警告异常  " + userDTO.toString(), e);
             result.modifyResult(false, e.getMessage());
@@ -96,16 +98,17 @@ public class UserController extends BaseController {
         try {
             UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
             ValidParamUtil.validNotNull(userDO);
-            userDTO.setCreateId(userDO.getId());
-            userDTO.setCreateName(userDO.getName());
-            userDTO.setCreateTime(new Date());
-            userDTO.setModifyId(userDO.getId());
-            userDTO.setModifyName(userDO.getName());
-            userDTO.setModifyTime(new Date());            //状态默认未删除
+            qo.setCreateId(userDO.getId());
+            qo.setCreateName(userDO.getName());
+            qo.setCreateTime(new Date());
+            //状态默认未删除
             BeanUtils.copyProperties(qo, userDTO);
             qo.setId(StringUtil.uuid());
             //设置默认密码
             qo.setPassword(MD5Util.getMD5("111111"));
+            qo.setIdentityId("1");
+            qo.setIdentityName("普通用户");
+            qo.setState(StateConstants.NORMAL);
             //验证邮箱是否已经存在
             userService.verifyEmail(userDTO.getEmail());
             userService.add(qo);
@@ -130,9 +133,9 @@ public class UserController extends BaseController {
         try {
             ValidParamUtil.validNotNull(userDTO.getEmail());
             UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
-            userDTO.setModifyId(userDO.getId());
-            userDTO.setModifyName(userDO.getName());
-            userDTO.setCreateTime(new Date());
+            qo.setModifyId(userDO.getId());
+            qo.setModifyName(userDO.getName());
+            qo.setModifyTime(new Date());
             BeanUtils.copyProperties(qo, userDTO);
             userService.modify(qo);
             result.modifyResult(true, qo, "修改成功");
@@ -169,13 +172,14 @@ public class UserController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/find")
     public Result findUser(UserDTO userDTO, @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo, @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        Result result = new Result();
+            Result result = new Result();
         try {
             //dto 转 do
             UserDO userDO = new UserDO();
             BeanUtils.copyProperties(userDO, userDTO);
             PageHelper.startPage(pageNo, pageSize);
             List<UserDO> userList = userService.findByParams(userDO);
+            PageBean<UserDO> pageBean = new PageBean<>(userList);
             //do 转 vo
             List<UserVO> voList = new ArrayList<>();
             for (UserDO user : userList) {
@@ -184,7 +188,14 @@ public class UserController extends BaseController {
                 vo.setState(StateConstants.getNameByState(user.getState()));
                 voList.add(vo);
             }
-            result.modifyResult(true, voList, "用户列表查询成功");
+            //封装数据
+            Map<String, Object> map = new HashMap<>();
+            map.put("data", voList);
+            map.put("total", pageBean.getTotal());
+            map.put("pageSize", pageBean.getPageSize());
+            map.put("pageNo", pageBean.getPageNum());
+            map.put("page", pageBean.getPages());
+            result.modifyResult(true, map, "用户列表查询成功");
         } catch (ServiceException | ValidateParamsException e) {
             log.warn("查询用户异常  ", e);
             result.modifyResult(false, e.getMessage());
@@ -207,7 +218,7 @@ public class UserController extends BaseController {
             ValidParamUtil.validNotNull(email, userDTO.getIdentityId());
             UserDO userDO = userService.findByEmail(userDTO);
             BeanUtils.copyProperties(userDO, userDTO);
-            userDO.setIdentityName(ConfigMap.getRoleNameById(userDTO.getIdentityId()));
+            userDO.setIdentityName(ConfigMap.getRoleNameById(Integer.valueOf(userDTO.getIdentityId())));
             userService.modify(userDO);
             result.modifyResult(true, "设置用户角色成功");
         } catch (Exception e) {
@@ -223,6 +234,13 @@ public class UserController extends BaseController {
     public Result findRoleList(){
         List<BaseItemMap> roleList = ConfigMap.getRoleList();
         result.modifyResult(true, roleList, "获取角色列表成功");
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/findMenu")
+    public Result findMenu() {
+
         return result;
     }
 }

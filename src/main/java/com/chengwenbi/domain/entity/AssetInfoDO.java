@@ -1,5 +1,6 @@
 package com.chengwenbi.domain.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.chengwenbi.common.BaseEntity;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -10,15 +11,24 @@ import java.util.Date;
  * @date:   2018/3/13 17:02
  */
 public class AssetInfoDO extends BaseEntity {
+
+    private String name;
     private String assetNo;//资产编号
-    private String caregoryId;//类别id
+    private String categoryId;//类别id
     private String categoryName;//资产名字
     private BigDecimal money;
+
+    /*@JSONField(format = "yyyy-MM-dd hh:mm:ss")*/
     private Date purchaseTime;//购买时间
     private Integer status;//资产状态
     private Integer account;//总量
     private String producers;
+
+    @JSONField(format = "yyyy-MM-dd")
     private Date produceDate;
+
+    //借出数量
+    private Integer applyCount;
 
     public String getAssetNo() {
         return assetNo;
@@ -28,12 +38,12 @@ public class AssetInfoDO extends BaseEntity {
         this.assetNo = assetNo;
     }
 
-    public String getCaregoryId() {
-        return caregoryId;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setCaregoryId(String caregoryId) {
-        this.caregoryId = caregoryId;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getCategoryName() {
@@ -90,5 +100,21 @@ public class AssetInfoDO extends BaseEntity {
 
     public void setProduceDate(Date produceDate) {
         this.produceDate = produceDate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getApplyCount() {
+        return applyCount;
+    }
+
+    public void setApplyCount(Integer applyCount) {
+        this.applyCount = applyCount;
     }
 }

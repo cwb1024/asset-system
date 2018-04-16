@@ -1,17 +1,17 @@
-package com.chengwenbi.domain.entity;
+package com.chengwenbi.domain.dto;
 
 import com.chengwenbi.common.BaseEntity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * @description:资产记录表（一个借出记录代表一个订单）
- * @author: chengwenbi
- * @date:   2018/3/13 17:03
- */
-public class AssetOrderDO extends BaseEntity {
+public class OrderInfoDTO extends BaseEntity {
+
+    private String name;
+    private Integer account;//资产数目
     private Integer type;
     private Integer status;
+    private String serialNumber;
     private String nowUserId;
     private String nowUserName;
     private Date nowTime;
@@ -19,8 +19,25 @@ public class AssetOrderDO extends BaseEntity {
     private String approverId;
     private String approverName;
     private Date approveTime;
+    private Integer operFlag;
     private String propApproverId;
     private String propApproverName;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAccount() {
+        return account;
+    }
+
+    public void setAccount(Integer account) {
+        this.account = account;
+    }
 
     public Integer getType() {
         return type;
@@ -38,6 +55,13 @@ public class AssetOrderDO extends BaseEntity {
         this.status = status;
     }
 
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
 
     public String getNowUserId() {
         return nowUserId;
@@ -93,6 +117,14 @@ public class AssetOrderDO extends BaseEntity {
 
     public void setNowTime(Date nowTime) {
         this.nowTime = nowTime;
+    }
+
+    public Integer getOperFlag() {
+        return operFlag;
+    }
+
+    public void setOperFlag(Integer operFlag) {
+        this.operFlag = operFlag;
     }
 
     public String getPropApproverId() {

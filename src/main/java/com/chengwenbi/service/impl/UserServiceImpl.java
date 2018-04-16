@@ -89,7 +89,7 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
         ValidParamUtil.validNotNull(email);
         Integer count = userMapper.verifyEmail(email);
         if (count != null && count > 0) {
-            throw new ServiceException("y邮箱已存在");
+            throw new ServiceException("邮箱已存在");
         }
         return true;
     }

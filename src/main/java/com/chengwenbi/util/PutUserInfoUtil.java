@@ -12,8 +12,5 @@ public class PutUserInfoUtil {
         entity.setCreateId(userDO.getId());
         entity.setCreateName(userDO.getName());
         entity.setCreateTime(now);
-        entity.setModifyId(userDO.getId());
-        entity.setModifyName(userDO.getName());
-        entity.setModifyTime(now);
     }
 }

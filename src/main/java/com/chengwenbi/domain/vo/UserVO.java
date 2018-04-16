@@ -1,13 +1,23 @@
 package com.chengwenbi.domain.vo;
 
 public class UserVO {
+    private String id;
     private String name;
     private String email;
     private String state;
+    private Integer isAdmin;
     private String departmentId;
     private String departmentName;
     private String identityId;
     private String identityName;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -64,5 +74,13 @@ public class UserVO {
 
     public void setIdentityName(String identityName) {
         this.identityName = identityName;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }
