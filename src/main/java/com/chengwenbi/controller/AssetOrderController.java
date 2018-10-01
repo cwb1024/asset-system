@@ -11,7 +11,12 @@ import com.chengwenbi.domain.entity.AssetInfoDO;
 import com.chengwenbi.domain.entity.AssetOrderDO;
 import com.chengwenbi.domain.entity.OrderItemDO;
 import com.chengwenbi.domain.entity.UserDO;
+import com.chengwenbi.domain.vo.DataVO;
+import com.chengwenbi.domain.vo.ExcelData;
 import com.chengwenbi.service.OrderInfoService;
+import com.chengwenbi.util.DateUtil;
+import com.chengwenbi.util.ExcelParam;
+import com.chengwenbi.util.ExcelUtil;
 import com.chengwenbi.util.ValidParamUtil;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.beanutils.BeanUtils;
@@ -23,11 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/order")
@@ -142,5 +146,55 @@ public class AssetOrderController extends BaseController {
             result.modifyResult(false, "订单列表查询失败");
         }
         return result;
+    }
+    /**
+     * 根据日期范围查询订单详情
+     */
+    @RequestMapping("/findOrderByDate")
+    @ResponseBody
+    public Result findOrderByDate(OrderInfoDTO orderInfoDTO) {
+        //统计这个日期范围的
+        try {
+            List<DataVO> maps = orderInfoService.findOrderByTime(orderInfoDTO);
+            result.modifyResult(true, maps,"获取统计数据成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * Excel 数据导出，根据选择日范围导出   借出 、
+     */
+    @RequestMapping(value = "/download")
+    public void download(OrderInfoDTO orderInfoDTO,HttpServletResponse response) throws Exception {
+
+        List<ExcelData> excelData = orderInfoService.findExcelData(orderInfoDTO);
+        String[] heads = {"操作类型", "清单编号", "资产名称", "类别名称", "数量","借用人","审批人","审批时间"};
+        List<String[]> data = new LinkedList<>();
+        for (int i = 0; i < excelData.size(); i++) {
+            ExcelData entity = excelData.get(i);
+            String[] temp = new String[8];
+            String typeName = "";
+            if (entity.getType() == 5) {
+                typeName = "归还";
+            } else if (entity.getType() == 7) {
+                typeName = "借出";
+            } else {
+                typeName = "报废";
+            }
+            temp[0] = typeName;
+            temp[1] = entity.getOrderId();
+            temp[2] = entity.getName();
+            temp[3] = entity.getCategoryName();
+            temp[4] = String.valueOf(entity.getAccount());
+            temp[5] = entity.getCreateName();
+            temp[6] = entity.getApproverName();
+
+            temp[7] = DateUtil.formatDate(entity.getCreateTime());
+            data.add(temp);
+        }
+        ExcelParam param =new ExcelParam.Builder("数据统计").headers(heads).data(data).build();
+        ExcelUtil.export(param,response);
     }
 }

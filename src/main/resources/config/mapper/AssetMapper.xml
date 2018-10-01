@@ -32,7 +32,7 @@
     <sql id="sql_query">
         <where>
             <if test="name != null and name != ''">
-                and name=#{name}
+                and name like CONCAT(CONCAT("%",#{name}),"%")
             </if>
             <if test=" assetNo != null and assetNo != ''">
                 and asset_no = #{assetNo}

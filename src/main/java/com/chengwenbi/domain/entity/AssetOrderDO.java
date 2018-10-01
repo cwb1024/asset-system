@@ -21,6 +21,7 @@ public class AssetOrderDO extends BaseEntity {
     private Date approveTime;
     private String propApproverId;
     private String propApproverName;
+    private Date repayTime;
 
     public Integer getType() {
         return type;
@@ -109,5 +110,13 @@ public class AssetOrderDO extends BaseEntity {
 
     public void setPropApproverName(String propApproverName) {
         this.propApproverName = propApproverName;
+    }
+
+    public Date getRepayTime() {
+        return repayTime;
+    }
+
+    public void setRepayTime(Date repayTime) {
+        this.repayTime = repayTime;
     }
 }

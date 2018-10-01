@@ -11,6 +11,7 @@ import com.chengwenbi.constant.StatusConstants;
 import com.chengwenbi.controller.base.BaseController;
 import com.chengwenbi.domain.dto.AssetDTO;
 import com.chengwenbi.domain.dto.AssetOperDTO;
+import com.chengwenbi.domain.dto.OrderInfoDTO;
 import com.chengwenbi.domain.entity.AssetInfoDO;
 import com.chengwenbi.domain.entity.CategoryDO;
 import com.chengwenbi.domain.entity.UserDO;
@@ -53,6 +54,9 @@ public class AssetInfoController extends BaseController {
     public Result addAsset(HttpSession session, AssetDTO assetDTO) {
         UserDO userDO= (UserDO) session.getAttribute(SessionConstants.USER_KEY);
         try {
+            if (!"2".equals(userDO.getIdentityId())) {
+                throw new ServiceException("非超级管理员不允许操作");
+            }
             ValidParamUtil.validNotNull(assetDTO.getName());
             AssetInfoDO queryDO = new AssetInfoDO();
             queryDO.setName(assetDTO.getName());
@@ -84,6 +88,9 @@ public class AssetInfoController extends BaseController {
         //资产id
         UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
         try {
+            if (!"2".equals(userDO.getIdentityId())) {
+                throw new ServiceException("非超级管理员不允许操作");
+            }
             ValidParamUtil.validNotNull(assetDTO.getId());
             //DTO  转 DO
             AssetInfoDO assetInfoDO = new AssetInfoDO();
@@ -93,6 +100,9 @@ public class AssetInfoController extends BaseController {
             assetInfoDO.setModifyTime(new Date());
             assetService.modify(assetInfoDO);
             result.modifyResult(true,assetDTO.getId(),"修改资产信息成功");
+        } catch (ServiceException e) {
+            log.error("修改资产失败  ", e);
+            result.modifyResult(false, e.getMessage());
         } catch (Exception e) {
             log.error("修改资产信息失败", e);
             result.modifyResult(false,"修改资产信息失败");
@@ -105,12 +115,18 @@ public class AssetInfoController extends BaseController {
     public Result deleteAsset(HttpSession session,AssetDTO assetDTO){
         UserDO userDO = (UserDO) session.getAttribute(SessionConstants.USER_KEY);
         try {
+            if (!"2".equals(userDO.getIdentityId())) {
+                throw new ServiceException("非超级管理员不允许操作");
+            }
             ValidParamUtil.validNotNull(assetDTO.getId());
             AssetInfoDO assetInfoDO = new AssetInfoDO();
             PutUserInfoUtil.userInfo(assetInfoDO,userDO);
             assetInfoDO.setId(assetDTO.getId());
             assetService.delete(assetInfoDO);
             result.modifyResult(true,assetDTO.getId(),"资产删除成功");
+        } catch (ServiceException e) {
+            log.error("删除资产失败  ", e);
+            result.modifyResult(false, e.getMessage());
         }catch (Exception e){
             log.error("资产删除失败",e);
             result.modifyResult(false,assetDTO.getId(),"资产删除失败");

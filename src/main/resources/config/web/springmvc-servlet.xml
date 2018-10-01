@@ -59,7 +59,7 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <mvc:exclude-mapping path="/user/login"/>
+            <mvc:exclude-mapping path="/api/user/login"/>
             <bean class="com.chengwenbi.intercepter.LoginInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

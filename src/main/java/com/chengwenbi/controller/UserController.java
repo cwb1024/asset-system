@@ -10,7 +10,9 @@ import com.chengwenbi.constant.SessionConstants;
 import com.chengwenbi.constant.StateConstants;
 import com.chengwenbi.controller.base.BaseController;
 import com.chengwenbi.domain.dto.UserDTO;
+import com.chengwenbi.domain.entity.MenuDO;
 import com.chengwenbi.domain.entity.UserDO;
+import com.chengwenbi.domain.vo.MenuVO;
 import com.chengwenbi.domain.vo.UserVO;
 import com.chengwenbi.service.UserService;
 import com.chengwenbi.util.MD5Util;
@@ -239,8 +241,13 @@ public class UserController extends BaseController {
 
     @ResponseBody
     @RequestMapping(value = "/findMenu")
-    public Result findMenu() {
-
+    public Result findMenu(String identityId) {
+        try {
+            List<MenuDO> menu = userService.findMenu(identityId);
+            result.modifyResult(true, menu, "获取菜单列表成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return result;
     }
 }

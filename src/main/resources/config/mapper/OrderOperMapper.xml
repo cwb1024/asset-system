@@ -51,6 +51,7 @@
             <if test="createId != null and createId != ''">creater_id,</if>
             <if test="createName != null and createName !=''">creater_name,</if>
             <if test="createTime != null">create_time,</if>
+            <if test="operationTime != null and operationTime !=''">operation_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">#{id},</if>
@@ -61,6 +62,7 @@
             <if test="createId != null">#{createId},</if>
             <if test="createName != null">#{createName},</if>
             <if test="createTime != null">#{createTime},</if>
+            <if test="operationTime !=null and operationTime !=''">#{operationTime},</if>
         </trim>
     </insert>
 

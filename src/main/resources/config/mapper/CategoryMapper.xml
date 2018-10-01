@@ -23,7 +23,7 @@
                 and id = #{id}
             </if>
             <if test=" name != null and name != ''">
-                and name = #{name}
+                and name like CONCAT(CONCAT("%",#{name}),"%")
             </if>
             <if test="parentId != null and parentId != ''">
                 and parent_id = #{parentId}

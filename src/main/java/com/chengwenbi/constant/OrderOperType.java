@@ -15,5 +15,6 @@ public class OrderOperType {
 
     public static Integer DESTROY = 6;//报废
 
-    public static Integer HIRE = 7;//
+    public static Integer HIRE = 7;//借出
+
 }

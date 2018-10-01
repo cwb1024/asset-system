@@ -8,16 +8,16 @@ import com.chengwenbi.constant.OrderStatus;
 import com.chengwenbi.dao.AssetMapper;
 import com.chengwenbi.dao.OrderInfoMapper;
 import com.chengwenbi.dao.OrderOperMapper;
+import com.chengwenbi.dao.UserMapper;
 import com.chengwenbi.dao.base.BaseInterfaceMapper;
 import com.chengwenbi.domain.dto.AssetDTO;
 import com.chengwenbi.domain.dto.AssetOperDTO;
 import com.chengwenbi.domain.dto.OrderInfoDTO;
-import com.chengwenbi.domain.entity.AssetInfoDO;
-import com.chengwenbi.domain.entity.AssetOperDO;
-import com.chengwenbi.domain.entity.AssetOrderDO;
-import com.chengwenbi.domain.entity.OrderItemDO;
+import com.chengwenbi.domain.entity.*;
 import com.chengwenbi.service.OrderOperService;
+import com.chengwenbi.service.UserService;
 import com.chengwenbi.service.base.BaseInterfaceServiceImpl;
+import com.chengwenbi.util.MailUtil;
 import com.chengwenbi.util.StringUtil;
 import com.chengwenbi.util.ValidParamUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,9 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
 
     @Autowired
     private AssetMapper assetMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
 
     //为了父类拿到mapper对象
@@ -88,6 +91,7 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         return orderId;
     }
 
+    //批准
     @Override
     public String approveOrder(OrderInfoDTO orderInfoDTO)throws Exception {
         String orderId = orderInfoDTO.getId();
@@ -117,15 +121,22 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         operDO.setType(OrderOperType.AGREE_APPROVAL);
         operDO.setBeforeStatus(OrderStatus.DAIAPPROVAL);
         operDO.setAfterStatus(OrderStatus.APPROVALING);
-        if (nowTime == null) {
+        /*if (nowTime == null) {
             operDO.setOperationTime(String.valueOf(orderInfoDTO.getApproveTime().getTime()));
         } else {
             operDO.setOperationTime(String.valueOf(orderInfoDTO.getApproveTime().getTime() - nowTime.getTime()));
-        }
+        }*/
         orderOperMapper.save(operDO);
+        //发送邮件
+        Mail mail = new Mail();
+        UserDO user = userMapper.findById(orderDO.getCreateId());
+        mail.setReceiver(user.getEmail());
+        mail.setMessage("您的申请单据已经被批准，请前往领取资产！");
+        new MailUtil().send(mail);
         return orderInfoDTO.getId();
     }
 
+    //归还
     @Override
     public String repayOrder(AssetOperDTO assetOperDTO) throws Exception {
         String orderId = assetOperDTO.getOrderId();
@@ -142,6 +153,7 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         assetOrderDO.setNowTime(assetOperDTO.getCreateTime());
         assetOrderDO.setNowUserId(assetOperDTO.getCreateId());
         assetOrderDO.setNowUserName(assetOperDTO.getCreateName());
+        assetOrderDO.setRepayTime(assetOperDTO.getCreateTime());
         assetOrderDO.setStatus(OrderStatus.REPAY);
         //更新订单表
         orderInfoMapper.update(assetOrderDO);
@@ -157,7 +169,7 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         operDO.setType(OrderOperType.REPAY);
         operDO.setBeforeStatus(OrderStatus.HIRE);
         operDO.setAfterStatus(OrderStatus.REPAY);
-        operDO.setOperationTime(String.valueOf(assetOperDTO.getCreateTime().getTime() - nowTime.getTime()));
+        /*operDO.setOperationTime(String.valueOf(assetOperDTO.getCreateTime().getTime() - nowTime.getTime()));*/
         orderOperMapper.save(operDO);
         //资产数量维护
         OrderItemDO itemDO = new OrderItemDO();
@@ -205,7 +217,7 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         operDO.setType(OrderOperType.DESTROY);
         operDO.setBeforeStatus(OrderStatus.HIRE);
         operDO.setAfterStatus(OrderStatus.REPAY);
-        operDO.setOperationTime(String.valueOf(assetOperDTO.getCreateTime().getTime() - nowTime.getTime()));
+       /* operDO.setOperationTime(String.valueOf(assetOperDTO.getCreateTime().getTime() - nowTime.getTime()));*/
         orderOperMapper.save(operDO);
         //资产表数量维护
         AssetInfoDO assetInfoDO = new AssetInfoDO();
@@ -279,6 +291,12 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         if (i == 0) {
             throw new ServiceException("批量插入失败");
         }
+        //发送邮件
+        Mail mail = new Mail();
+        UserDO user = userMapper.findById(oi.getPropApproverId());
+        mail.setReceiver(user.getEmail());
+        mail.setMessage(oi.getRemark());
+        new MailUtil().send(mail);
         return orderId;
     }
 
@@ -311,11 +329,13 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         operDO.setType(OrderOperType.DISAGREE_APPROVAL);
         operDO.setBeforeStatus(OrderStatus.DAIAPPROVAL);
         operDO.setAfterStatus(OrderStatus.DISAGREE);
-        if (nowTime == null) {
+        //添加备注
+        operDO.setOperationTime(orderInfoDTO.getRemark());
+        /*if (nowTime == null) {
             operDO.setOperationTime(String.valueOf(orderInfoDTO.getApproveTime().getTime()));
         } else {
             operDO.setOperationTime(String.valueOf(orderInfoDTO.getApproveTime().getTime() - nowTime.getTime()));
-        }
+        }*/
         orderOperMapper.save(operDO);
         return orderId;
     }
@@ -328,10 +348,16 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
         if (orderDO == null) {
             throw new ServiceException("清单不存在");
         }
+        if (orderDO.getStatus() != OrderStatus.APPROVALING) {
+            throw new ServiceException("非批准的清单不允许借出");
+        }
         orderDO.setStatus(OrderStatus.HIRE);
         orderDO.setNowTime(assetOperDTO.getCreateTime());
         orderDO.setNowUserName(assetOperDTO.getCreateName());
         orderDO.setNowUserId(assetOperDTO.getCreateId());
+        orderDO.setModifyId(assetOperDTO.getCreateId());
+        orderDO.setModifyName(assetOperDTO.getCreateName());
+        orderDO.setModifyTime(assetOperDTO.getModifyTime());
         orderInfoMapper.update(orderDO);
         //操作表
         AssetOperDO oper= new AssetOperDO();
@@ -359,6 +385,8 @@ public class OrderOperServiceImpl extends BaseInterfaceServiceImpl<AssetOperDO> 
             infoDO.setAccount(count);
             if (count == 0) {
                 infoDO.setStatus(AssetStatus.NONE);
+            } else {
+                infoDO.setStatus(AssetStatus.LEISURE);
             }
             assetMapper.updateCount(infoDO);
         }

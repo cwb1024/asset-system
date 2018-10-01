@@ -1,12 +1,17 @@
 package com.chengwenbi.service.impl;
 
 import com.chengwenbi.constant.AssetStatus;
+import com.chengwenbi.constant.OrderOperType;
 import com.chengwenbi.dao.AssetMapper;
+import com.chengwenbi.dao.OrderOperMapper;
 import com.chengwenbi.dao.base.BaseInterfaceMapper;
 import com.chengwenbi.domain.dto.AssetDTO;
+import com.chengwenbi.domain.dto.AssetOperDTO;
 import com.chengwenbi.domain.entity.AssetInfoDO;
+import com.chengwenbi.domain.entity.AssetOperDO;
 import com.chengwenbi.service.AssetService;
 import com.chengwenbi.service.base.BaseInterfaceServiceImpl;
+import com.chengwenbi.util.StringUtil;
 import com.chengwenbi.util.ValidParamUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,9 @@ public class AssetServiceImpl extends BaseInterfaceServiceImpl<AssetInfoDO> impl
     @Autowired
     private AssetMapper assetMapper;
 
+    @Autowired
+    private OrderOperMapper orderOperMapper;
+
     @Override
     public BaseInterfaceMapper<AssetInfoDO> getBaseInterfaceMapper() {
         return assetMapper;
@@ -32,6 +40,15 @@ public class AssetServiceImpl extends BaseInterfaceServiceImpl<AssetInfoDO> impl
         AssetInfoDO infoDO = assetMapper.findById(assetDTO.getId());
         infoDO.setStatus(AssetStatus.BREAKDOWN);
         assetMapper.update(infoDO);
+        //加到记录表中
+        AssetOperDO operDO = new AssetOperDO();
+        operDO.setId(StringUtil.uuid());
+        operDO.setOrderId(infoDO.getId());
+        operDO.setType(OrderOperType.DESTROY);
+        operDO.setCreateId(assetDTO.getCreateId());
+        operDO.setCreateName(assetDTO.getCreateName());
+        operDO.setCreateTime(assetDTO.getCreateTime());
+        orderOperMapper.save(operDO);
         return assetDTO.getId();
     }
 

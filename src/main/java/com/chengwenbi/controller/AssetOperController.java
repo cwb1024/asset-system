@@ -134,6 +134,9 @@ public class AssetOperController extends BaseController {
             PutUserInfoUtil.userInfo(assetOperDTO, userDO);
             orderOperService.repayOrder(assetOperDTO);
             result.modifyResult(true, assetOperDTO.getOrderId(), "归还成功");
+        } catch (ServiceException e) {
+            log.error("归还失败", e);
+            result.modifyResult(false, "归还失败");
         } catch (Exception e) {
             log.error("归还失败", e);
             result.modifyResult(false, "归还失败");
@@ -200,9 +203,14 @@ public class AssetOperController extends BaseController {
             PutUserInfoUtil.userInfo(assetOperDTO, userDO);
             String id = orderOperService.receiverOrder(assetOperDTO);
             result.modifyResult(true, id, "资产领取成功");
+        } catch (ServiceException e) {
+            result.modifyResult(false,e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+            result.modifyResult(false,"借出失败");
         }
         return result;
     }
+
+
 }

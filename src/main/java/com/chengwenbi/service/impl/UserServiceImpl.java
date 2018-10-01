@@ -5,6 +5,7 @@ import com.chengwenbi.common.exception.ServiceException;
 import com.chengwenbi.dao.UserMapper;
 import com.chengwenbi.dao.base.BaseInterfaceMapper;
 import com.chengwenbi.domain.dto.UserDTO;
+import com.chengwenbi.domain.entity.MenuDO;
 import com.chengwenbi.domain.entity.UserDO;
 import com.chengwenbi.service.UserService;
 import com.chengwenbi.service.base.BaseInterfaceServiceImpl;
@@ -13,6 +14,8 @@ import com.chengwenbi.util.ValidParamUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -92,6 +95,13 @@ public class UserServiceImpl extends BaseInterfaceServiceImpl<UserDO> implements
             throw new ServiceException("邮箱已存在");
         }
         return true;
+    }
+
+    @Override
+    public List<MenuDO> findMenu(String identityId) throws Exception {
+        ValidParamUtil.validNotNull(identityId);
+        List<MenuDO> menu = userMapper.findMenu(identityId);
+        return menu;
     }
 
 }

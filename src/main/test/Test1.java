@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
@@ -22,10 +23,16 @@ public class Test1 {
 
     public static void test11(){
 
+        String jsonStr = "[{\"name\":\"张三\",\"type\":\"1\",\"email\":\"aa\"}," +
+                "{\"name\":\"李四\",\"type\":\"2\",\"email\":\"bb\"}]";
+
+        List<Tdata> tdata = JSONArray.parseArray(jsonStr, Tdata.class);
+        System.out.println(tdata);
+
     }
 
     public static void main(String[] args) {
-        reverse(123);
+        test11();
     }
 
     @Test

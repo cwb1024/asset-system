@@ -14,10 +14,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-       /* Object user = request.getSession().getAttribute(SessionConstants.USER_KEY);
-        if (user == null) {
+        Object user = request.getSession().getAttribute(SessionConstants.USER_KEY);
+       /* if (user == null) {
             log.warn("用户未登录");
-            response.sendRedirect("/index.jsp");
+            response.sendRedirect("http://localhost:8080");
             return false;
         }*/
         return true;

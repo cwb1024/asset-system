@@ -22,10 +22,11 @@
         <result property="approverId" column="approver_id"/>
         <result property="approver_name" column="approver_name"/>
         <result property="approveTime" column="approve_time"/>
+        <result property="repayTime" column="repay_time"/>
     </resultMap>
 
     <sql id="All_Column_List">
-        id,type,status,now_user_id,now_user_name,now_time,remark,approver_id,approve_time,creater_id,creater_name,create_time,modify_id,modify_name,modify_time
+        id,type,status,now_user_id,now_user_name,now_time,remark,approver_id,approve_time,creater_id,creater_name,create_time,modify_id,modify_name,modify_time,repay_time
     </sql>
 
     <!-- sql 查询条件 -->
@@ -86,6 +87,7 @@
             <if test="modifyTime != null">modify_time,</if>
             <if test="propApproverId != null and propApproverId !=''">prop_approver_id,</if>
             <if test="propApproverName != null and propApproverName !=''">prop_approver_name,</if>
+            <if test="repayTime != null">repay_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">#{id},</if>
@@ -106,6 +108,7 @@
             <if test="modifyTime != null">#{modifyTime},</if>
             <if test="propApproverId != null and propApproverId !=''">#{propApproverId},</if>
             <if test="propApproverName != null and propApproverName !=''">#{propApproverName},</if>
+            <if test="repayTime != null">#{repayTime},</if>
         </trim>
     </insert>
 
@@ -120,6 +123,7 @@
             <if test="approverId != null and approverId">approver_id=#{approverId},</if>
             <if test="approverName != null and approverName !=''">approver_name=#{approverName},</if>
             <if test="approveTime != null">approve_time=#{approveTime},</if>
+            <if test="repayTime != null">repay_time=#{repayTime},</if>
         </set>
         where id=#{id}
     </update>
@@ -140,6 +144,7 @@
            <if test="id != null and id !=''">and id=#{id}</if>
            and status in (2,4)
        </where>
+        order by create_time desc
     </select>
 
     <select id="findById" parameterType="java.lang.String" resultMap="result">
@@ -161,6 +166,62 @@
     <select id="findOrderItems" resultMap="itemMap">
       select * from order_item where order_id=#{id}
     </select>
+
+    <resultMap id="dataMap" type="com.chengwenbi.domain.vo.DataVO">
+        <result column="type" property="type"/>
+        <result column="count" property="count"/>
+    </resultMap>
+
+    <select id="findOrderByTime" resultMap="dataMap">
+        select type,count(1) count from asset_operation
+        <where>
+            <if test="previousTime != null and previousTime !=''">
+                <![CDATA[
+                and DATE_FORMAT(create_time, '%Y-%m-%d')>=DATE_FORMAT(#{previousTime}, '%Y-%m-%d')
+                ]]>
+            </if>
+            <if test="nextTime != null and nextTime !=''">
+                <![CDATA[
+                and DATE_FORMAT(create_time, '%Y-%m-%d') <=DATE_FORMAT(#{nextTime}, '%Y-%m-%d')
+                ]]>
+            </if>
+        </where>
+        group by type
+    </select>
+
+    <resultMap id="excelMap" type="com.chengwenbi.domain.vo.ExcelData">
+        <result property="type" column="type"/>
+        <result property="orderId" column="order_id"/>
+        <result property="name" column="name"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="account" column="account"/>
+        <result property="createName" column="creater_name"/>
+        <result property="approverName" column="approver_name"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    <select id="findExcelData" resultMap="excelMap">
+        select op.type,it.order_id,it.name,it.category_name,it.account,o.creater_name,o.approver_name,op.create_time
+        from asset_operation op
+        left join order_item it
+        on op.order_id = it.order_id
+        left join asset_order o
+        on op.order_id = o.id
+        <where>
+            <if test="previousTime != null and previousTime !=''">
+                <![CDATA[
+                and DATE_FORMAT(op.create_time, '%Y-%m-%d')>=DATE_FORMAT(#{previousTime}, '%Y-%m-%d')
+                ]]>
+            </if>
+            <if test="nextTime != null and nextTime !=''">
+                <![CDATA[
+                and DATE_FORMAT(op.create_time, '%Y-%m-%d') <=DATE_FORMAT(#{nextTime}, '%Y-%m-%d')
+                ]]>
+            </if>
+            and op.type in(5,7)
+        </where>
+      ORDER BY type,op.order_id
+    </select>
+
 
 
 </mapper>

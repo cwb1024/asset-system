@@ -22,6 +22,8 @@ public class OrderInfoDTO extends BaseEntity {
     private Integer operFlag;
     private String propApproverId;
     private String propApproverName;
+    private String previousTime;
+    private String nextTime;
 
     public String getName() {
         return name;
@@ -141,5 +143,21 @@ public class OrderInfoDTO extends BaseEntity {
 
     public void setPropApproverName(String propApproverName) {
         this.propApproverName = propApproverName;
+    }
+
+    public String getPreviousTime() {
+        return previousTime;
+    }
+
+    public void setPreviousTime(String previousTime) {
+        this.previousTime = previousTime;
+    }
+
+    public String getNextTime() {
+        return nextTime;
+    }
+
+    public void setNextTime(String nextTime) {
+        this.nextTime = nextTime;
     }
 }

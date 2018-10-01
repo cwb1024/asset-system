@@ -12,6 +12,7 @@ public class MenuDO {
     private Integer degree;
     private Integer sort;
     private Integer isShow;
+    private String url;
 
     public String getId() {
         return id;
@@ -59,5 +60,25 @@ public class MenuDO {
 
     public void setIsShow(Integer isShow) {
         this.isShow = isShow;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return "MenuDO{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", parentId='" + parentId + '\'' +
+                ", degree=" + degree +
+                ", sort=" + sort +
+                ", isShow=" + isShow +
+                '}';
     }
 }
